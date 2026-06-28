@@ -89,12 +89,6 @@ class _PaymentPlanDetailsScreenState extends ConsumerState<PaymentPlanDetailsScr
         SnackBar(
           content: Text(isNowPaid ? 'Payment marked as paid' : 'Payment marked as unpaid'),
           duration: const Duration(seconds: 2),
-          action: SnackBarAction(
-            label: 'UNDO',
-            onPressed: () {
-              ref.read(installmentProvider(widget.plan.id).notifier).togglePaidStatus(installment, widget.plan);
-            },
-          ),
         ),
       );
     }
