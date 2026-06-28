@@ -77,13 +77,13 @@ class PaymentPlan extends HiveObject {
   String getUnpayErrorMessage() {
     switch (frequency) {
       case 'weekly':
-        return 'Cannot mark as unpaid: Payment was due more than a week ago.';
+        return 'Cannot change payment status: payment is older than 1 week.';
       case 'monthly':
-        return 'Cannot mark as unpaid: Payment was due more than a month ago.';
+        return 'Cannot change payment status: payment is older than 1 month.';
       case 'annually':
-        return 'Cannot mark as unpaid: Payment was due more than a year ago.';
+        return 'Cannot change payment status: payment is older than 1 year.';
       default:
-        return 'Cannot mark as unpaid.';
+        return 'Cannot change payment status.';
     }
   }
 }

@@ -36,13 +36,13 @@ class _PaymentPlanDetailsScreenState extends ConsumerState<PaymentPlanDetailsScr
               onPressed: () => Navigator.pop(ctx),
               child: const Text('Cancel'),
             ),
-            FilledButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-                _togglePaidStatus(installment, showUndo: true);
-              },
-              child: const Text('Confirm'),
-            ),
+              FilledButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  _togglePaidStatus(installment, showUndo: false);
+                },
+                child: const Text('Confirm'),
+              ),
           ],
         ),
       );
