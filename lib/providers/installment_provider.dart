@@ -4,15 +4,17 @@ import '../models/payment_plan.dart';
 import '../database/app_database.dart';
 import '../services/installment_generator_service.dart';
 import 'payment_plan_provider.dart';
+import 'dashboard_provider.dart';
 
 final installmentProvider = StateNotifierProvider.family<InstallmentNotifier, List<Installment>, String>((ref, planId) {
-  return InstallmentNotifier(planId);
+  return InstallmentNotifier(planId, ref);
 });
 
 class InstallmentNotifier extends StateNotifier<List<Installment>> {
   final String planId;
+  final Ref ref;
 
-  InstallmentNotifier(this.planId) : super([]) {
+  InstallmentNotifier(this.planId, this.ref) : super([]) {
     loadInstallments();
   }
 
@@ -30,11 +32,13 @@ class InstallmentNotifier extends StateNotifier<List<Installment>> {
     await InstallmentGeneratorService.regenerateNotification(plan, installment);
     
     loadInstallments();
+    ref.invalidate(dashboardProvider);
   }
 
   Future<void> updateInstallment(Installment installment, PaymentPlan plan) async {
     await AppDatabase.updateInstallment(installment);
     await InstallmentGeneratorService.regenerateNotification(plan, installment);
     loadInstallments();
+    ref.invalidate(dashboardProvider);
   }
 }
