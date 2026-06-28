@@ -20,7 +20,10 @@ class _PaymentPlanDetailsScreenState extends ConsumerState<PaymentPlanDetailsScr
     if (installment.isPaid) {
       if (!widget.plan.canUnpayInstallment(installment)) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(widget.plan.getUnpayErrorMessage())),
+          SnackBar(
+            content: Text(widget.plan.getUnpayErrorMessage()),
+            duration: const Duration(seconds: 2),
+          ),
         );
         return;
       }
@@ -85,6 +88,7 @@ class _PaymentPlanDetailsScreenState extends ConsumerState<PaymentPlanDetailsScr
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(isNowPaid ? 'Payment marked as paid' : 'Payment marked as unpaid'),
+          duration: const Duration(seconds: 2),
           action: SnackBarAction(
             label: 'UNDO',
             onPressed: () {
