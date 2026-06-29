@@ -18,8 +18,6 @@ void main() async {
       child: PayTrackApp(),
     ),
   );
-  
-  FlutterNativeSplash.remove();
 }
 
 class PayTrackApp extends ConsumerWidget {
