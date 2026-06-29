@@ -5,7 +5,6 @@ import 'plans_screen.dart';
 import 'calculator_screen.dart';
 import 'settings_screen.dart';
 import '../providers/theme_provider.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -23,14 +22,6 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     PlansScreen(),
     CalculatorScreen(),
   ];
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      FlutterNativeSplash.remove();
-    });
-  }
 
   @override
   void dispose() {

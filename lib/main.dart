@@ -4,11 +4,9 @@ import 'database/app_database.dart';
 import 'services/notification_service.dart';
 import 'screens/main_screen.dart';
 import 'providers/theme_provider.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 void main() async {
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  WidgetsFlutterBinding.ensureInitialized();
   
   await AppDatabase.init();
   await NotificationService.init();
