@@ -14,6 +14,8 @@ class AddPaymentPlanScreen extends ConsumerStatefulWidget {
   ConsumerState<AddPaymentPlanScreen> createState() => _AddPaymentPlanScreenState();
 }
 
+enum CreateMode { specifyPeriods, autoCalculatePeriods }
+
 class _AddPaymentPlanScreenState extends ConsumerState<AddPaymentPlanScreen> {
   final _formKey = GlobalKey<FormState>();
   
@@ -21,7 +23,10 @@ class _AddPaymentPlanScreenState extends ConsumerState<AddPaymentPlanScreen> {
   final _descController = TextEditingController();
   final _periodsController = TextEditingController();
   final _amountController = TextEditingController();
+  final _totalPlanAmountController = TextEditingController();
   final _notifyDaysController = TextEditingController(text: '1');
+  
+  CreateMode _mode = CreateMode.specifyPeriods;
   
   String _frequency = 'monthly';
   DateTime _startDate = DateTime.now();
@@ -42,6 +47,7 @@ class _AddPaymentPlanScreenState extends ConsumerState<AddPaymentPlanScreen> {
     _descController.dispose();
     _periodsController.dispose();
     _amountController.dispose();
+    _totalPlanAmountController.dispose();
     _notifyDaysController.dispose();
     super.dispose();
   }
@@ -62,14 +68,27 @@ class _AddPaymentPlanScreenState extends ConsumerState<AddPaymentPlanScreen> {
 
   void _savePlan() async {
     if (_formKey.currentState!.validate()) {
+      int periods = 1;
+      double amount = double.tryParse(_amountController.text) ?? 0.0;
+      
+      if (_mode == CreateMode.specifyPeriods) {
+        periods = int.tryParse(_periodsController.text) ?? 1;
+      } else {
+        double total = double.tryParse(_totalPlanAmountController.text) ?? 0.0;
+        if (amount > 0) {
+          periods = (total / amount).ceil();
+          if (periods <= 0) periods = 1;
+        }
+      }
+
       final plan = PaymentPlan(
         id: Uuid().v4(),
         title: _titleController.text.trim(),
         description: _descController.text.trim(),
         startDate: _startDate,
         frequency: _frequency,
-        totalPeriods: int.tryParse(_periodsController.text) ?? 1,
-        defaultAmount: double.tryParse(_amountController.text) ?? 0.0,
+        totalPeriods: periods,
+        defaultAmount: amount,
         notifyDaysBefore: int.tryParse(_notifyDaysController.text) ?? 3,
         createdAt: DateTime.now(),
         colorValue: _selectedColorValue,
@@ -174,23 +193,57 @@ class _AddPaymentPlanScreenState extends ConsumerState<AddPaymentPlanScreen> {
               onChanged: (v) => setState(() => _frequency = v!),
             ),
             const SizedBox(height: 16),
+            SegmentedButton<CreateMode>(
+              segments: const [
+                ButtonSegment(
+                  value: CreateMode.specifyPeriods,
+                  label: Text('Enter Periods'),
+                ),
+                ButtonSegment(
+                  value: CreateMode.autoCalculatePeriods,
+                  label: Text('Auto Calculate'),
+                ),
+              ],
+              selected: {_mode},
+              onSelectionChanged: (Set<CreateMode> newSelection) {
+                setState(() => _mode = newSelection.first);
+              },
+            ),
+            const SizedBox(height: 16),
             Row(
               children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: _periodsController,
-                    decoration: const InputDecoration(
-                      labelText: 'Total Periods',
-                      border: OutlineInputBorder(),
+                if (_mode == CreateMode.specifyPeriods)
+                  Expanded(
+                    child: TextFormField(
+                      controller: _periodsController,
+                      decoration: const InputDecoration(
+                        labelText: 'Total Periods',
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: TextInputType.number,
+                      validator: (v) {
+                        if (v == null || v.isEmpty) return 'Required';
+                        if (int.tryParse(v) == null) return 'Invalid number';
+                        return null;
+                      },
                     ),
-                    keyboardType: TextInputType.number,
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return 'Required';
-                      if (int.tryParse(v) == null) return 'Invalid number';
-                      return null;
-                    },
+                  )
+                else
+                  Expanded(
+                    child: TextFormField(
+                      controller: _totalPlanAmountController,
+                      decoration: const InputDecoration(
+                        labelText: 'Total Plan Amount',
+                        border: OutlineInputBorder(),
+                      ),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      validator: (v) {
+                        if (v == null || v.isEmpty) return 'Required';
+                        if (double.tryParse(v) == null) return 'Invalid number';
+                        return null;
+                      },
+                    ),
                   ),
-                ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: TextFormField(

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/payment_plan.dart';
 import '../models/installment.dart';
 import '../providers/installment_provider.dart';
+import '../providers/payment_plan_provider.dart';
 import '../providers/settings_provider.dart';
 import 'package:intl/intl.dart';
 
@@ -94,6 +95,31 @@ class _PaymentPlanDetailsScreenState extends ConsumerState<PaymentPlanDetailsScr
     }
   }
 
+  void _confirmDeletePlan() {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Plan'),
+        content: const Text('Are you sure you want to delete this plan? This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
+            onPressed: () {
+              Navigator.pop(ctx);
+              ref.read(paymentPlanProvider.notifier).deletePlan(widget.plan.id);
+              Navigator.pop(context);
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final installments = ref.watch(installmentProvider(widget.plan.id));
@@ -109,7 +135,11 @@ class _PaymentPlanDetailsScreenState extends ConsumerState<PaymentPlanDetailsScr
             onPressed: () {
               // Edit plan functionality could go here
             },
-          )
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: _confirmDeletePlan,
+          ),
         ],
       ),
       body: Column(
