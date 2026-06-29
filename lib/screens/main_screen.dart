@@ -69,19 +69,26 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       ),
       body: Column(
         children: [
-          // Top Navigation Icons
+          // Glassy Top Navigation Pill
           Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildTopNavButton(0, Icons.bar_chart, 'Analytics'),
-                _buildTopNavButton(1, Icons.credit_card, 'My Plans'),
-                _buildTopNavButton(2, Icons.calculate, 'Calculator'),
-              ],
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            child: Container(
+              padding: const EdgeInsets.all(6.0),
+              decoration: BoxDecoration(
+                color: Theme.of(context).brightness == Brightness.dark 
+                    ? const Color(0xFF2C2C2E)
+                    : Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(40),
+              ),
+              child: Row(
+                children: [
+                  _buildTopNavButton(0, Icons.explore_rounded, 'Dashboard'),
+                  _buildTopNavButton(1, Icons.folder_copy_rounded, 'My Plans'),
+                  _buildTopNavButton(2, Icons.calculate_rounded, 'Calculator'),
+                ],
+              ),
             ),
           ),
-          const Divider(height: 1),
           // Main Swipeable Content
           Expanded(
             child: PageView(
@@ -112,27 +119,51 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
   Widget _buildTopNavButton(int index, IconData icon, String label) {
     final isActive = _currentPage == index;
-    final color = isActive ? Theme.of(context).colorScheme.primary : Colors.grey.shade500;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     
-    return InkWell(
-      onTap: () => _goToPage(index),
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: color, size: 28),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                color: color,
-                fontSize: 12,
-                fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+    final selectedBgColor = isDark ? const Color(0xFF48484A) : Colors.white;
+    final unselectedBgColor = Colors.transparent;
+    
+    final selectedIconColor = isDark ? Colors.white : Colors.black87;
+    final unselectedIconColor = isDark ? Colors.white54 : Colors.black54;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => _goToPage(index),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeInOut,
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          decoration: BoxDecoration(
+            color: isActive ? selectedBgColor : unselectedBgColor,
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: isActive && !isDark ? [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              )
+            ] : null,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon, 
+                color: isActive ? selectedIconColor : unselectedIconColor, 
+                size: 26
               ),
-            ),
-          ],
+              const SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isActive ? selectedIconColor : unselectedIconColor,
+                  fontSize: 13,
+                  fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
